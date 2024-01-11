@@ -37,7 +37,7 @@ Welcome to the `WeatherData` folder! This directory contains the weather dataset
 
 ## Notes
 
-- Columns are in Swedish here, later will be in English.
+- Columns are in Swedish here, is in English in `TheData.csv`.
 - Ordered from SMHI.
 
 Happy co(-w)ding! 🐮💻
