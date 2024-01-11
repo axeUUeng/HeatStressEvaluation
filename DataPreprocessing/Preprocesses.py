@@ -11,38 +11,51 @@ import os
 class MilkDataProcessor:
     def __init__(self) -> None:
         """
-        Class to load MilkYield and correct corresponding MESAN file.
-        It is assumed that the MilkYield data has already been preprocessed by the script 'MilkDataFilterTimestamps1.py
-        Because it uses the new column 'DateTime' (simply the 'StartDate' and 'StartTime' concatenated)
+        Class to load GIGACOW data and correct corresponding MESAN file.
 
         """
         print(f"Hello {os.getlogin()}. Let's start")
-        self.script_directory = os.path.dirname(os.path.realpath(__file__))
-        self.parent_directory = os.path.dirname(self.script_directory)
-        
+        self.script_directory = os.path.dirname(os.path.realpath(__file__)) # the directory of this script
+        self.parent_directory = os.path.dirname(self.script_directory) # its parent directory
 
-        self.rawGIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData', 'rawGIGACOW')
-        self.rawMESAN_directory = os.path.join(self.parent_directory, 'Data', 'WeatherData', 'rawMESAN')  # Path to all MESAN files e.g. 'Mesan_data/MESAN_PROCESSED/'
+        # directory of "raw" GIGACOW-data "/Data/Cowdata/rawGIGACOW/"
+        self.rawGIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData', 'rawGIGACOW') 
+        # directory to all MESAN files e.g. '/Data/WeatherData/rawMESAN'
+        self.rawMESAN_directory = os.path.join(self.parent_directory, 'Data', 'WeatherData', 'rawMESAN')  
 
+    def filter_data(self, startdate: str, enddate: str, farms: list=None) -> None:
+        """
+        Method of the MilkDataProcessor class to filter the data based on a start-date and a end-date.
 
-    def filter_data(self, startdate, enddate, farms=None) -> list:
+        Args:
+            startdate: This is the startdate of type string e.g. '2022-01-01 00:00:00'.
+            enddate: This is the endate of type string e.g. '2023-11-13 23:00:00'.
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            None
+        """
+        # directory to filtered GIGACOW data
         self.GIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData','GIGACOW')
-        os.makedirs(self.GIGACOW_directory, exist_ok=True)  
+        # Create the folder if it doesn't exists
+        os.makedirs(self.GIGACOW_directory, exist_ok=True)
         print("\nFiltering GIGACOW based on dates...", end='', flush=True)
         pbar = tqdm(glob.glob(os.path.join(self.rawGIGACOW_directory, '*.csv')), desc = 'Filtering GIGACOW based on dates')
         for fname in pbar:
-            filename = os.path.basename(fname)
+            filename = os.path.basename(fname) #Get the name of the .csv file e.g. MilkYield.csv
             pbar.set_description(f'Filtering {filename} based on dates')
-            if filename == 'Cow.csv':
+            if filename == 'Cow.csv': #No dates in cow.csv so special case
                 df = pd.read_csv(fname, delimiter=';', low_memory=False)
+                # save a copy in new folder to make life easier
                 output_file_path = os.path.join(self.GIGACOW_directory, f"{filename.replace('.csv', f'_filtered.csv')}")
                 df.to_csv(output_file_path, index=False)
-            else:
+            else: # all other files has dates
                 df = pd.read_csv(fname, delimiter=';', parse_dates=True, low_memory=False)
-                if farms is not None:
-                    assert all(farm in df['FarmName_Pseudo'].unique() for farm in farms), f"Not all farms exist in {filename}."
+                if farms is not None: # if only need a subset of the farms
+                    # assert that the requested farms exists in the data
+                    assert all(farm in df['FarmName_Pseudo'].unique() for farm in farms), f"Not all farms exist in {filename}." 
                     df = df[df['FarmName_Pseudo'].isin(farms)].copy()
                 
+                # All datasets have slight different date and time naming conventions
                 date_column = None
                 time_column = None
                 datetime_column = None
@@ -73,29 +86,33 @@ class MilkDataProcessor:
                 else:
                     raise ValueError(f"No valid date or datetime column found in {filename}") 
                 
+                # save each filtered file in /Data/CowData/GIGACOW/ as XXX_filtered.csv
                 output_file_path = os.path.join(self.GIGACOW_directory, f"{filename.replace('.csv', f'_filtered.csv')}")
                 filtered_df.to_csv(output_file_path, index=False)
+        
         pbar.set_description('Filtering GIGACOW based on dates - Done')
         print("\rFiltering GIGACOW based on dates...Done!")
 
 
 
-    def load_milk_data(self, farms = None) -> None:
+    def load_milk_data(self, farms: list = None) -> None:
         """
-        Loads the MilkYield.csv, specified by 'self.milk_data_path' and join with cow data info.
+        Method of the MilkDataProcessor class to load and preproccess the MilkYield data.
+
+        Args:
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            None
         """
-        # Read the milking data from 'milk_data_path'
         print("\nLoading Milk Data...", end='', flush=True)
+        # Read the milking data from '/Data/CowData/GIGACOW/MilkYield_filtered.csv'
         milk_data_directory = os.path.join(self.GIGACOW_directory, "MilkYield_filtered.csv")
         milk = pd.read_csv(milk_data_directory, delimiter=",")
-        # milk = pd.read_csv(self.milk_data_path, delimiter=",")
-        if farms is not None:
-            #milk_copy = pd.DataFrame()
+        
+        if farms is not None: # if only a subset of the farms are desired
+            # assert that the requested farms exists in the data
             assert all(farm in milk['FarmName_Pseudo'].unique() for farm in farms), f"Not all farms exist in the Milkdata!."
             milk = milk[milk['FarmName_Pseudo'].isin(farms)].copy()
-            # for farm in farms:
-            #     milk_copy = milk_copy.append(milk[milk['FarmName_Pseudo'] == farm])
-            # milk = milk_copy.copy()
         
         # remove some columns
         milk_data = milk.drop(
@@ -110,26 +127,22 @@ class MilkDataProcessor:
         )
         # convert the 'TotalYield' to numeric format and replace commas with dots to handle decimal notation
         # and finally use 'errors='coerce' to replace any conversion errors with NaN values
-        milk_data["TotalYield"] = pd.to_numeric(
-            milk_data["TotalYield"].str.replace(",", "."), errors="coerce"
-        )
+        milk_data["TotalYield"] = pd.to_numeric(milk_data["TotalYield"].str.replace(",", "."), errors="coerce")
 
-        milk_data["StartDate"] = pd.to_datetime(
-            milk_data["StartDate"]
-        )  # convert to datetime format
+        milk_data["StartDate"] = pd.to_datetime(milk_data["StartDate"])  # convert to datetime format
         milk_data["DateTime"] = pd.to_datetime(milk_data["DateTime"])
 
         milk_data = milk_data.dropna()  # drop NaNs
-        milk_data = milk_data.astype(
-            {"LactationNumber": "int"}
-        )  # Make the Lactationnumber into an integer
-        cow_data_directory = os.path.join(self.GIGACOW_directory, "Cow_filtered.csv")
-        cows_df = pd.read_csv(cow_data_directory, delimiter=",")  # Read the cow data to get the correct breed
 
-        # some duplicates exists - probably because of cows that have been moved/sold to different farms
-        cows_df = cows_df.drop_duplicates(
-            subset=["SE_Number"], keep="first"
-        ).reset_index(drop=True)
+        milk_data = milk_data.astype({"LactationNumber": "int"})  # Make the Lactationnumber into an integer
+
+        # Read the cow data to get the correct breed
+        cow_data_directory = os.path.join(self.GIGACOW_directory, "Cow_filtered.csv") 
+        cows_df = pd.read_csv(cow_data_directory, delimiter=",")  
+
+        # some duplicates exists - probably because of cows that have been moved/sold to different farms.
+        # keep fist mention of each cow.
+        cows_df = cows_df.drop_duplicates(subset=["SE_Number"], keep="first").reset_index(drop=True)
 
         # merge the milk data with the breed information
         self.milk_data = pd.merge(
@@ -137,29 +150,45 @@ class MilkDataProcessor:
         )
         print("\rLoading Milk Data... Done!")
 
-    def get_sick_data(self, farms=None) -> pd.DataFrame:
+    def get_sick_data(self, farms: list=None) -> pd.DataFrame:
+        """
+        Method of the MilkDataProcessor class to load, preproccess and returns the DiagnosisTreatment data.
+
+        Args:
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            Pandas.DataFrame
+        """
+        # Read the Diagnosis data from '/Data/CowData/GIGACOW/DiagnosisTreatment_filtered.csv'
         sick_data_directory = os.path.join(self.GIGACOW_directory, "DiagnosisTreatment_filtered.csv")
         sick = pd.read_csv(sick_data_directory, delimiter=",")
         if farms is not None:
-            
             assert all(farm in sick['FarmName_Pseudo'].unique() for farm in farms), f"Not all farms exist in the SickData!."
             sick = sick[sick['FarmName_Pseudo'].isin(farms)].copy()
-            # for farm in farms:
-            #     sick_copy = sick_copy.append(sick[sick['FarmName_Pseudo'] == farm])
-            # sick = sick_copy.copy()
         self.sick_data = sick.drop(
             columns=["Unnamed: 0", "Del_Cow_Id", "OriginalFileSource", "dwh_factCowHealth_Id",
                      ])
-
         self.sick_data["HealthEventDate"] = pd.to_datetime(self.sick_data["HealthEventDate"])
-
         self.sick_data["HealthEventOccurred"] = ~self.sick_data["HealthEventDate"].isna()
         return self.sick_data
     
-    def weatherPreProcessing(self, points, start_date, end_date, farms=None) -> None:
-        param = 117
+    def weatherPreProcessing(self, points: list, start_date: datetime.date, end_date: datetime.date, farms=None) -> None:
+        """
+        Method of the MilkDataProcessor class to load, preproccess weather data.
+        More specificly adds Global Irradiance and calcualtes THI_adj.
+        Args:
+            start_date: Start date
+            end_date: End date
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            None
+        """
+        param = 117 # [116, 117, 118, 119, 120, 121, 122]
+
+        #"CIE UV irradiance", "Global irradiance", "Direct normal irradiance", "PAR", "Direct horizontal irradiance", "Diffuse irradiance"
         pname = "Global irradiance"
         interval = "hourly"
+        # Create directory for processed weather data 'Data/WeatherData/MESAN/'
         self.MESAN_directory = os.path.join(self.parent_directory, 'Data', 'WeatherData','MESAN')
         os.makedirs(self.MESAN_directory, exist_ok=True)
         print("\nAdding Global Irradiance and THI_adj...", end='', flush=True)
@@ -168,19 +197,20 @@ class MilkDataProcessor:
             points = [point for point in points if point["id"] in farms]
         pbar = tqdm(points, desc = 'Adding Global Irradiance and THI_adj ...')
         for point in pbar:
-            name = point["id"]
-            lat = point["lat"]
-            lon = point["lon"]
+            name = point["id"] #Farm Psuedo
+            lat = point["lat"] #lat of farm
+            lon = point["lon"] # lon of farm
             pbar.set_description(f'Adding Global Irradiance and THI_adj to {name}')
             
-            fname = f"{name}_2022-2023.csv"
-            
-            fpath = os.path.join(self.rawMESAN_directory, fname)
-            if not os.path.exists(fpath):
+            fname = f"{name}_2022-2023.csv" # Name of 'raw' mesan file
+            fpath = os.path.join(self.rawMESAN_directory, fname) # path to 'raw' mesan file
+
+            if not os.path.exists(fpath): #If it doesn't exist, skip this farm
                 continue
+            # read it as a Pandas dataframe
             df = pd.read_csv(fpath, delimiter=';')
-            #The following adds the six STRÅNG parameters to the data frame   
-            
+
+            #The following adds the STRÅNG parameter to the data frame   
             sDate = start_date.strftime('%Y-%m-%d')
             eDate = end_date.strftime('%Y-%m-%d')
             
@@ -194,11 +224,10 @@ class MilkDataProcessor:
             df = pd.merge(df, tf, on = "Tid")
             
             #THI calculation
-            df["THI_adj"] = 4.51 + (0.8 * df["Temperatur"]) + (df["Relativ fuktighet"] * (df["Temperatur"] - 14.4)) + 46.4 - 1.992 * df["Vindhastighet"] + 0.0068 * df["Global irradiance"] 
-            df["Tid"] = pd.to_datetime(df["Tid"])
+            df["THI_adj"] = 4.51 + (0.8 * df["Temperatur"]) + (df["Relativ fuktighet"] * (df["Temperatur"] - 14.4)) + 46.4 - 1.992 * df["Vindhastighet"] + 0.0068 * df["Global irradiance"]
             
 
-            #Writing the hourly and daily data
+            #Writing the hourly data
             output_file_path = os.path.join(self.MESAN_directory, f"processed_data_{name}.csv")
             df.to_csv(output_file_path, index=False)
         print("\rAdding Global Irradiance and THI_adj... Done!")
@@ -206,15 +235,20 @@ class MilkDataProcessor:
 
     def add_weather_data(self, farms=None) -> None:
         """
-        Add the mesan weather data, located under 'self.weather_data_path'
+        Method of the MilkDataProcessor class to combine weather data with milk data, and preprocess some more.
+        Args:
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            None
         """
-        # Read the weather data from 'weather_data_path'
+        # Read the weather data from 'Data/WeatherData/MESAN/'
         print("\nAdding Weather Data...", end='', flush=True)
-        files = os.listdir(self.MESAN_directory)  #
+        files = os.listdir(self.MESAN_directory)  # a list of all mesan weather .csv files
+
         all_data = []  # here we will fill each farm's milk and weather data after merge
-        all_farms = self.milk_data["FarmName_Pseudo"].unique()
-        if farms is not None:
-            farms = set(farms)  # Convert to a set for faster membership checks
+        all_farms = self.milk_data["FarmName_Pseudo"].unique() # list of farms
+        if farms is not None: # check if we only want a subset of farms
+            farms = set(farms)  # convert to a set for faster membership checks
             farms_to_process = [farm for farm in all_farms if farm in farms]
         else:
             farms_to_process = all_farms
@@ -227,26 +261,21 @@ class MilkDataProcessor:
                               for file in files
                               if f"processed_data_{farm_name}.csv" == file.strip('"')]
             
-            farm_data = self.milk_data[self.milk_data["FarmName_Pseudo"] == farm_name
-                                       ].copy()
+            farm_data = self.milk_data[self.milk_data["FarmName_Pseudo"] == farm_name].copy()
 
             if (len(matching_files) == 1):  # Assert that we have find 1 and only 1 corresponding weather data file
                 file_path = os.path.join(self.MESAN_directory, matching_files[0])
                 temp_data = pd.read_csv(file_path)  # read the weather data
 
-                temp_data["Tid"] = pd.to_datetime(
-                    temp_data["Tid"]
-                )  # Convert 'Tid' to datetime
+                temp_data["Tid"] = pd.to_datetime(temp_data["Tid"])  # maksure 'Tid' is datetime
+
                 # Here we create the Heatwave columns. Defined by SMHI as 'Maxtemperature >= 25 degrees celsius for atleast 5 days in a row
                 # in our definition; the 'HW' column will be 1 if the currect datapoint is experiencing a heatwave or if a heatwave has occured within
                 # 1 week ago (7 days)
-                temp_data.set_index(
-                    "Tid", inplace=True
-                )  # set the index to the timestamps
+                temp_data.set_index("Tid", inplace=True)  # set the index to the timestamps
                 temp_data = temp_data.sort_index()  # make sure they are orded by time
-                max_temp_per_day = (
-                    temp_data["Temperatur"].resample("D").max()
-                )  # calculate the Max temp for each day
+                max_temp_per_day = (temp_data["Temperatur"].resample("D").max())  # calculate the Max temp for each day
+
                 max_temp_per_day = max_temp_per_day.reset_index()  # reset the index
                 max_temp_per_day["HW"] = 0  # init a 'HW' column and set it to 0
 
@@ -283,22 +312,14 @@ class MilkDataProcessor:
                                 max_temp_per_day.loc[i, "cum_HW"] = A
 
                         # Use an exponential decay formula to adjust 'cum_HW' values for the next 1 week after the heatwave
-                        max_temp_per_day.loc[
-                            group_data.index[-1] + 1 : group_data.index[-1] + 7,
-                            "cum_HW",
-                        ] = (
-                            A - 0.01 * np.exp(np.arange(1, 8) * 0.125 * np.log(100 * A))
-                        ).round(
-                            2
-                        )
+                        max_temp_per_day.loc[group_data.index[-1] + 1 : group_data.index[-1] + 7,"cum_HW"
+                                             ] = (A - 0.01 * np.exp(np.arange(1, 8) * 0.125 * np.log(100 * A))
+                        ).round(2)
                         # Set 'HW' to 1 for 1 week
                         max_temp_per_day.loc[
-                            group_data.index[-1] + 1 : group_data.index[-1] + 7, "HW"
-                        ] = 1
+                            group_data.index[-1] + 1 : group_data.index[-1] + 7, "HW"] = 1
 
                 temp_data["Tid"] = pd.to_datetime(temp_data.index)
-
-                # max_temp_per_day['Tid'] = pd.to_datetime(max_temp_per_day['Tid'])
 
                 # Merge on the 'Tid' column
                 temp_data = pd.merge(
@@ -334,12 +355,10 @@ class MilkDataProcessor:
                     right_on="Tid",
                     how="inner",
                 )
-                complete_data.drop(
-                    "DateHour", axis=1, inplace=True
-                )  # Drop the 'datehour' column
-                complete_data.drop(
-                    "Tid", axis=1, inplace=True
-                )  # as well as the 'Tid' column
+                complete_data.drop("DateHour", axis=1, inplace=True)  # Drop the 'datehour' column
+                complete_data.drop("Tid", axis=1, inplace=True)  # as well as the 'Tid' column
+
+                # Rename some columns to english
                 complete_data.rename(columns = {'Relativ fuktighet':'Relative Humidity', 'Temperatur':'Temperature', 'Nederbörd':'Precipitation'}, inplace = True)
                 all_data.append(complete_data)  # append to the list of datas
 
@@ -358,16 +377,26 @@ class MilkDataProcessor:
         self.all_data['StartTime'] = pd.to_datetime(self.all_data['StartTime'], format='%H:%M:%S', errors='coerce').dt.time
         self.all_data['StartDate'] = pd.to_datetime(self.all_data['StartDate'], errors='coerce')
 
-        # do some initial preproccesing and remove outliers where the yield is below 2.5 kg and aboce 50 kg
+        # remove outliers where the yield is below 2.5 kg and above 50 kg (for one milking instance, NOT DAILY)
         self.all_data = self.all_data[
             (self.all_data["TotalYield"] >= 2.5) & (self.all_data["TotalYield"] <= 50)
         ]
         
+        # Save under 'Data/' as 'TheData.csv'
         output_file_path = os.path.join(self.parent_directory,'Data', f"TheData.csv")
         self.all_data.to_csv(output_file_path, index=False)
         print("\rAdding Weather Data... Done!")
 
     def preprocess(self, start_date, end_date, farms=None):
+        """
+        Method of the MilkDataProcessor class to preprocess the data.
+        Args:
+            This is the startdate of type string e.g. '2022-01-01 00:00:00'.
+            enddate: This is the endate of type string e.g. '2023-11-13 23:00:00'. 
+            farms: A list of farm pseudos. Deafult is None: then all farms are included
+        Returns:
+            None
+        """
         if farms is None:
             self.filter_data(start_date, end_date)
             coord_directory = os.path.join(self.parent_directory, 'Data', 'WeatherData','Coordinates','Coordinates.csv')
@@ -409,12 +438,11 @@ class MilkDataProcessor:
 
 
 
-
 def main():
     processor = MilkDataProcessor()
     start_date = '2022-01-01 00:00:00'
     end_date = '2023-11-13 23:00:00'
-    processor.preprocess(start_date=start_date, end_date=end_date)
+    processor.preprocess(start_date=start_date, end_date=end_date, farms = ['f454e660', 'a624fb9a'])
 
 
 if __name__ == "__main__":
