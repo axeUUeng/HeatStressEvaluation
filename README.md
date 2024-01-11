@@ -1,4 +1,4 @@
-# Evaluating Resilience to Heat Stress among Dairy Cows in Sweden
+# Evaluating Resilience to Heat Stress among Dairy Cows in Sweden 🐄🌡️
 
 **This GitHub repository houses the codebase for a study investigating the impact of Swedish weather conditions, particularly heat, on dairy cows' milk production on Swedish farms. Using weather data sourced from Sveriges meteorologiska och hydrologiska institut (SMHI) and extensive dairy data from the Gigacow project at Sveriges lantbruksuniversitet (SLU).**
 
@@ -23,16 +23,6 @@ This project sutdies the relationship between weather conditions and dairy cow m
 - Employment of several statistical methods
 - ...
 
-## Installation
-Follow one of the installation guides for conda
-- [Anaconda Installation](https://docs.anaconda.com/free/anaconda/install/index.html)
-- [Miniconda Installation](https://docs.conda.io/projects/miniconda/en/latest/)
-
-Then to get the proper enviroment:
-```bash
-# Conda env installation command
-conda create --name your_enviroment_name --file requirements.txt
-```
 ## Repo structure
 ```
 HeatStressEvaluation (project-root)/
@@ -40,7 +30,7 @@ HeatStressEvaluation (project-root)/
 |   |-- TheData.csv
 |   |
 |   |-- CowData/
-|   |    |
+|   |    |-- CowData_README.md
 |   |    |-- GIGACOW/
 |   |    |   |-- Cow_filtered.csv
 |   |    |   |-- DiagnosisTreatment_filtered.csv
@@ -56,6 +46,7 @@ HeatStressEvaluation (project-root)/
 |   |        |-- Robot.csv
 |   |
 |   |-- WeatherData/
+|       |-- WeatherData_README.md
 |       |-- Coordinates/
 |       |   |-- Coordinates.csv
 |       |
@@ -86,8 +77,26 @@ HeatStressEvaluation (project-root)/
 ```
 ## Prerequisites
 Before running the scripts, make sure to fulfill the following prerequisites:
+### 0. Git Clone
+```bash
+git clone https://github.com/axeUUeng/HeatStressEvaluation.git
+```
+And then change into the project directory:
+```bash
+cd /path/to/HeatStressEvaluation
+```
+Replace `/path/to/HeatStressEvaluation` with the actual path to the `HeatStressEvaluation` project directory.
+### 1. Installation
+Follow one of the installation guides for conda
+- [Anaconda Installation](https://docs.anaconda.com/free/anaconda/install/index.html)
+- [Miniconda Installation](https://docs.conda.io/projects/miniconda/en/latest/)
 
-### 1. Datasets
+Then to get the proper enviroment:
+```bash
+# Conda env installation command
+conda create --name your_enviroment_name --file requirements.txt
+```
+### 2. Datasets
 
 Some datasets are necessary and should be placed in the "Data" folder according to the structure provided above. Ensure the availability of the following datasets and their correct placement:
 
@@ -100,17 +109,5 @@ Some datasets are necessary and should be placed in the "Data" folder according 
 - The MESAN files from SMHI
     - `XXXX_2022-2023.csv`
 ### 2. Preproccess the data
-Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb` 
-
-## Structure of Datasets
-### `Coordinates.csv`
-```csv
-Koordinater,FarmID,
-"00.00000, 10.00000", XXXXX,
-"01.00000, 11.00000",YYYYY,
-```
-### MESAN files : `XXXX_2022-2023.csv`
-Columns:
-```csv
-Tid;Temperatur;Daggpunktstemperatur;Relativ fuktighet;Vindhastighet;Vindriktning;Byvind;Nederbörd;Snö;Nederbördstyp;Molnighet;Sikt;Lufttryck
-```
+Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb`
+### 3. Run the models in `/Modeling/`
