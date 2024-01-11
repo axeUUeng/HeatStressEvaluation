@@ -12,10 +12,18 @@ from matplotlib.pyplot import cm
 
 class Gaussian:
     """
-    Class for creating the multivariate gaussian distribution
-    """
+    Class for creating the multivariate Gaussian distribution.
 
+    Attributes:
+        - mean (np.ndarray): The mean vector of the Gaussian distribution.
+        - cov (np.ndarray): The covariance matrix of the Gaussian distribution.
+
+    Methods:
+        - sample(N: int) -> np.ndarray: Generates random samples from the Gaussian distribution.
+
+    """
     def __init__(self, mean, cov):
+       
         self.mean = mean
         self.cov = cov
 
@@ -26,6 +34,42 @@ class Gaussian:
 
 
 class BayesianLinearRegression:
+    """
+    Class for Bayesian Linear Regression.
+
+    Attributes:
+    - dataframe (pd.DataFrame): The input data in the form of a pandas DataFrame.
+    - subject_name (str): Identifier for the subject (cow or farm).
+    - selected_features (Union[str, List[str]]): The selected features for regression.
+    - target (str): The target variable for regression.
+    - off_set_bool (bool): Whether to include an offset/intercept term in the model.
+    - subject_type (str): The type of the subject, either 'cow' or 'farm'.
+
+    Methods:
+    - fit_model(
+        prior_mean: Optional[np.ndarray] = None,
+        prior_cov: Optional[np.ndarray] = None,
+        beta: Optional[float] = None,
+    ) -> dict:
+        Fits the Bayesian Linear Regression model to the input data.
+
+    - plot_posterior_distributions() -> List[Figure]:
+        Plots the posterior distributions of the model parameters.
+
+    - assess_x_vector(ordered_by: str) -> np.ndarray:
+        Checks and gets the desired x-vector for plotting.
+
+    - plot_model_samples(
+        n_samples: int = 3, ordered_by: str = "Temperature"
+    ) -> Figure:
+        Samples and plots 'n_samples' models from the posterior.
+
+    - plot_model_uncertainty(
+        ordered_by: str = "Temperature", every_th: int = None
+    ) -> plt.Figure:
+        Plots the mean-model and 1, 2, and 3-standard deviation uncertainties.
+
+    """
     def __init__(
         self,
         dataframe: pd.DataFrame,
@@ -35,10 +79,20 @@ class BayesianLinearRegression:
         off_set_bool: bool = True,
         subject_type: str = None,
     ) -> None:
-        '''
-        Class for creating the Bayesian model
+        """
+        Initializes the BayesianLinearRegression class.
 
-        '''
+        Args:
+            - dataframe (pd.DataFrame): The input data in the form of a pandas DataFrame.
+            - subject_name (str): Identifier for the subject (cow or farm).
+            - selected_features (Union[str, List[str]]): The selected features for regression.
+            - target (str): The target variable for regression.
+            - off_set_bool (bool): Whether to include an offset/intercept term in the model.
+            - subject_type (str): The type of the subject, either 'cow' or 'farm'.
+
+        Returns:
+            - None
+        """
         # Initialize the class with the provided Bayesian data
         if subject_type is None:
             self.subject_type = subject_type
@@ -117,9 +171,17 @@ class BayesianLinearRegression:
         prior_cov: Optional[np.ndarray] = None,
         beta: Optional[float] = None,
         ) -> dict:
-        '''
-        Fits the model to the features 'self.Phi' to the desired target 'self.y'
-        '''
+        """
+        Fits the model to the features 'self.Phi' to the desired target 'self.y'.
+
+        Args:
+        - prior_mean (Optional[np.ndarray]): Prior mean for Bayesian Linear Regression.
+        - prior_cov (Optional[np.ndarray]): Prior covariance matrix for Bayesian Linear Regression.
+        - beta (Optional[float]): Precision parameter for Bayesian Linear Regression.
+
+        Returns:
+        - dict: Dictionary containing the posterior distributions.
+        """
         # priors p(\theta) = N(\theta; m0, S0)
         if prior_mean is None:
             self.prior_mean = np.zeros((self.Phi.shape[1], 1))
@@ -170,9 +232,12 @@ class BayesianLinearRegression:
         return self.result
 
     def plot_posterior_distributions(self) -> List[Figure]:
-        '''
-        Plot the posterior distributions of the model parameters
-        '''
+        """
+        Plot the posterior distributions of the model parameters.
+
+        Returns:
+        - List[Figure]: List of figures.
+        """
         figures = []
         for i in range(len(self.selected_features)):
             mu = self.posterior.mean[i]
@@ -211,9 +276,15 @@ class BayesianLinearRegression:
         return figures
 
     def assess_x_vector(self, ordered_by: str) -> np.ndarray:
-        '''
-        Function which checks and gets the desired x-vector ('ordered_by') to do plotting
-        '''
+        """
+        Function which checks and gets the desired x-vector ('ordered_by') to do plotting.
+
+        Args:
+        - ordered_by (str): Feature or target variable to use for ordering.
+
+        Returns:
+        - np.ndarray: X-vector for plotting.
+        """
         if ordered_by not in self.selected_features + self.target + ["StartDate", "DateTime",]:
             raise ValueError(
                 f"{ordered_by} is not a valid feature, target, 'StartDate', or 'DateTime'."
@@ -230,9 +301,16 @@ class BayesianLinearRegression:
     def plot_model_samples(
         self, n_samples: int = 3, ordered_by: str = "Temperatur"
     ) -> Figure:
-        '''
-        Sample and plot 'n_samples' models from the posterior
-        '''
+        """
+        Sample and plot 'n_samples' models from the posterior.
+
+        Args:
+        - n_samples (int): Number of samples to generate and plot.
+        - ordered_by (str): Feature or target variable to use for ordering.
+
+        Returns:
+        - Figure: Matplotlib Figure object representing the plot.
+        """
         #For samples of w \theta, f(x) = phi(x)^T \theta
         samples = np.array([self.Phi @ t for t in self.posterior.sample(n_samples)]) # draw n_samples from the posterior
         x_vector = self.assess_x_vector(ordered_by=ordered_by)
@@ -263,9 +341,16 @@ class BayesianLinearRegression:
     def plot_model_uncertainty(
         self, ordered_by: str = "Temperatur", every_th: int = None
         ) -> plt.Figure:
-        '''
-        Plots the mean-model and 1,2 and 3 - standard deviation uncertanties
-        '''
+        """
+        Plots the mean-model and 1, 2, and 3 - standard deviation uncertainties.
+
+        Args:
+        - ordered_by (str): Feature or target variable to use for ordering.
+        - every_th (int): Plot every-th data point for computational efficiency.
+
+        Returns:
+        - plt.Figure: Matplotlib Figure object representing the plot.
+        """
         
         # calculating the uncertanty can be very computationally heavy, using Numba to speed up 
         @nb.njit(parallel=True)
@@ -308,10 +393,11 @@ class BayesianLinearRegression:
             )
         
         plot_data = plot_data.sort_values(by=ordered_by)
-        fig = plt.figure(figsize=(10, 5)) #10 5
+        fig = plt.figure(figsize=(10, 5))
         ax = plt.subplot(111)
         if every_th is None: #Sometimes data is huge, then you set every_th to e.g. 100 to only plot every 100th sample
             every_th = 1
+        
         sns.scatterplot(
             x=ordered_by,
             y="Yield",
@@ -320,6 +406,7 @@ class BayesianLinearRegression:
             alpha=0.4,
             color = '#183B87',
             ax = ax)
+        
         sns.lineplot(
             x=ordered_by,
             y="Mean",
@@ -328,6 +415,7 @@ class BayesianLinearRegression:
             label="Mean",
             ax=ax
             )
+        
         ax.fill_between(
             plot_data[ordered_by].iloc[::every_th],
             (
@@ -340,6 +428,7 @@ class BayesianLinearRegression:
             label=f'$Mean \pm 3\\sigma$',
             alpha=0.7,
         )
+        
         ax.fill_between(
             plot_data[ordered_by].iloc[::every_th],
             (

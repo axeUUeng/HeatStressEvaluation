@@ -28,11 +28,11 @@ class MilkDataProcessor:
         Method of the MilkDataProcessor class to filter the data based on a start-date and a end-date.
 
         Args:
-            startdate: This is the startdate of type string e.g. '2022-01-01 00:00:00'.
-            enddate: This is the endate of type string e.g. '2023-11-13 23:00:00'.
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - startdate (str): This is the startdate of type string e.g. '2022-01-01 00:00:00'.
+            - enddate (str): This is the endate of type string e.g. '2023-11-13 23:00:00'.
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
-            None
+            - None
         """
         # directory to filtered GIGACOW data
         self.GIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData','GIGACOW')
@@ -100,9 +100,9 @@ class MilkDataProcessor:
         Method of the MilkDataProcessor class to load and preproccess the MilkYield data.
 
         Args:
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
-            None
+            - None
         """
         print("\nLoading Milk Data...", end='', flush=True)
         # Read the milking data from '/Data/CowData/GIGACOW/MilkYield_filtered.csv'
@@ -155,9 +155,9 @@ class MilkDataProcessor:
         Method of the MilkDataProcessor class to load, preproccess and returns the DiagnosisTreatment data.
 
         Args:
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
-            Pandas.DataFrame
+            - self.sick_data (Pandas.DataFrame): Dataframe of DiagnosisTreatment
         """
         # Read the Diagnosis data from '/Data/CowData/GIGACOW/DiagnosisTreatment_filtered.csv'
         sick_data_directory = os.path.join(self.GIGACOW_directory, "DiagnosisTreatment_filtered.csv")
@@ -177,9 +177,10 @@ class MilkDataProcessor:
         Method of the MilkDataProcessor class to load, preproccess weather data.
         More specificly adds Global Irradiance and calcualtes THI_adj.
         Args:
-            start_date: Start date
-            end_date: End date
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - points (list): List of dicts, with id: Farm Psuedo, lat: latitude and lon: longitude.
+            - start_date (datetime.date): Start date
+            - end_date (datetime.date): End date
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
             None
         """
@@ -237,9 +238,9 @@ class MilkDataProcessor:
         """
         Method of the MilkDataProcessor class to combine weather data with milk data, and preprocess some more.
         Args:
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
-            None
+            - None
         """
         # Read the weather data from 'Data/WeatherData/MESAN/'
         print("\nAdding Weather Data...", end='', flush=True)
@@ -391,11 +392,11 @@ class MilkDataProcessor:
         """
         Method of the MilkDataProcessor class to preprocess the data.
         Args:
-            This is the startdate of type string e.g. '2022-01-01 00:00:00'.
-            enddate: This is the endate of type string e.g. '2023-11-13 23:00:00'. 
-            farms: A list of farm pseudos. Deafult is None: then all farms are included
+            - start_date (str): This is the startdate e.g. '2022-01-01 00:00:00'.
+            - end_date (str): This is the enddate e.g. '2023-11-13 23:00:00'. 
+            - farms (list): A list of farm pseudos. Deafult is None: then all farms are included
         Returns:
-            None
+            - None
         """
         if farms is None:
             self.filter_data(start_date, end_date)
