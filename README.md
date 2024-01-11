@@ -89,7 +89,7 @@ Before running the scripts, make sure to fulfill the following prerequisites:
 
 ### 1. Datasets
 
-Some datasets are necessary and should be placed in the "Data" folder according to the structure provided below. Ensure the availability of the following datasets:
+Some datasets are necessary and should be placed in the "Data" folder according to the structure provided above. Ensure the availability of the following datasets and their correct placement:
 
 - `Cow.csv`
 - `DiagnosisTreatment.csv`
