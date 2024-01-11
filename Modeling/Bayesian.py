@@ -5,6 +5,7 @@ import matplotlib.pyplot as plt
 from matplotlib.figure import Figure
 import seaborn as sns
 import math
+import re
 from scipy import stats
 from typing import Union, List, Optional
 from itertools import cycle
@@ -329,7 +330,7 @@ class BayesianLinearRegression:
             line, = ax.plot(ordered_x, sample, color=c, alpha=0.7, label = f"Sample {i}")
             i += 1
 
-        plt.xlabel(ordered_by, fontsize=14)
+        plt.xlabel('Daily '+ re.sub(r'([a-z])([A-Z])', r'\1 \2', ordered_by), fontsize=14)
         plt.ylabel("Normalized Daily Yield", fontsize=14)
         plt.title(f"Posterior - samples for {self.subject_name}", fontsize=16)
         box = ax.get_position()
@@ -428,7 +429,7 @@ class BayesianLinearRegression:
             label=f'$Mean \pm 3\\sigma$',
             alpha=0.7,
         )
-        
+
         ax.fill_between(
             plot_data[ordered_by].iloc[::every_th],
             (
@@ -458,7 +459,7 @@ class BayesianLinearRegression:
 
         ax.legend(loc='center left', bbox_to_anchor=(1, 0.5))
 
-        plt.xlabel(ordered_by, fontsize=14)
+        plt.xlabel('Daily '+ re.sub(r'([a-z])([A-Z])', r'\1 \2', ordered_by), fontsize=14)
         plt.ylabel("Normalized Daily Yield", fontsize=14)
         plt.title(f"Bayesian Regression - {self.subject_name}", fontsize=16)
 
