@@ -19,10 +19,13 @@ class MilkDataProcessor:
         self.parent_directory = os.path.dirname(self.script_directory) # its parent directory
 
         # directory of "raw" GIGACOW-data "/Data/Cowdata/rawGIGACOW/"
-        self.rawGIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData', 'rawGIGACOW') 
+        self.rawGIGACOW_directory = os.path.join(self.parent_directory, 'Data', 'CowData', 'rawGIGACOW')
+        os.makedirs(self.rawGIGACOW_directory, exist_ok=True)
+
         # directory to all MESAN files e.g. '/Data/WeatherData/rawMESAN'
         self.rawMESAN_directory = os.path.join(self.parent_directory, 'Data', 'WeatherData', 'rawMESAN')  
-
+        os.makedirs(self.rawMESAN_directory, exist_ok=True)
+    
     def filter_data(self, startdate: str, enddate: str, farms: list=None) -> None:
         """
         Method of the MilkDataProcessor class to filter the data based on a start-date and a end-date.
