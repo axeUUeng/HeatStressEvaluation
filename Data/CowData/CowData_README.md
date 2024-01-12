@@ -27,8 +27,7 @@ Welcome to the `CowData` folder! This directory contains the dairy cow datasets 
 
 ## Notes
 
-- [Any additional notes or considerations for users].
-- [Mention if there are specific dependencies or requirements].
+- Permisson needed from SLU and the GIGACOW-administrators is needed to access the data.
 
 ## Contact
 

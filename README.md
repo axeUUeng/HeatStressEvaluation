@@ -67,9 +67,11 @@ HeatStressEvaluation (project-root)/
 |   |-- Bayesian.py
 |   |-- BayesianGAM.ipynb
 |   |-- BayesianLinear.ipnyb
-|   |-- XXXX
-|   |-- XXXX
-|   |-- XXXX
+|   |-- DataExploration.ipynb
+|   |-- DIMReduction.ipynb
+|   |-- RandomForest.ipynb
+|   |-- ShortBreedStudy.ipynb
+|   |-- BoxPlots.ipynb
 |
 |-- README.md
 |-- requirements.txt
@@ -90,11 +92,28 @@ Follow one of the installation guides for conda
 - [Anaconda Installation](https://docs.anaconda.com/free/anaconda/install/index.html)
 - [Miniconda Installation](https://docs.conda.io/projects/miniconda/en/latest/)
 
+Python version used by the authors is `3.10.13`.
+
 Then to get the proper enviroment:
 ```bash
 # Conda env installation command
 conda create --name your_enviroment_name --file requirements.txt
 ```
+If the creation of the enviroment doesn't work for some reason, the most important libraries are:
+- `Numpy`
+- `requests`
+- `scikit-learn`
+- `Numba`
+- `matplotlib`
+- `Seaborn`
+- `Pandas`
+- `SciPy`
+- `Patsy`
+- `tqdm`
+- `statsmodels`
+- `Umap`
+- `itertools`
+
 ### 2. Datasets
 
 Some datasets are necessary and should be placed in the "Data" folder according to the structure provided above. Ensure the availability of the following datasets and their correct placement:
@@ -108,7 +127,9 @@ Some datasets are necessary and should be placed in the "Data" folder according 
 - The MESAN files from SMHI
     - `XXXX_2022-2023.csv`
 ### 2. Preproccess the data
-Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb`
+Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb`.
+
+Resulting dataset with milk-records merged with weather is named and stored under `Data/TheData.csv`.
 ### 3. Run the models in `/Modeling/`
 
 ## `/Modeling/` Content
@@ -118,5 +139,5 @@ Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb`
 - `BayesianGAM.ipynb` - fits a GAM model to either one farm or one cow.
 - `BoxPlots.ipynb` - shows basic differences in temperature and yield for mainly summer 22 and summer 23.
 - `DIMReduction.ipynb` - short attempt at dimension reductions on the dataset.
-- `ShortBreedStudy.ipynb` - short attempt at visualising differnces between breeds in yield during `HW=1` and `HW=0`.
+- `ShortBreedStudy.ipynb` - short attempt at visualising differences between breeds in yield during `HW=1` and `HW=0`.
 - `RandomForest.ipynb` - Applies normalization to yield and then uses RandomForests to find patterns in the data.

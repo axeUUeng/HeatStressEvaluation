@@ -1,6 +1,6 @@
 # ⛈️Weather Data☀️
 
-Welcome to the `WeatherData` folder! This directory contains the weather datasets used in this project. Collected from [SMHI](https://www.smhi.se/data/oppna-data/meteorologiska-data/analysmodell-mesan-1.30445). Below, you'll find information about each dataset, its structure, and how to use it.
+Welcome to the `WeatherData` folder! This directory contains the weather datasets used in this project. Collected from [SMHI](https://www.smhi.se/data/oppna-data/meteorologiska-data/analysmodell-mesan-1.30445).
 
 ## Datasets
 
@@ -27,7 +27,7 @@ Welcome to the `WeatherData` folder! This directory contains the weather dataset
 
 
 ### 3. `/MESAN/`
-- **Description**: Preprocessed MESAN data (from `/RawMESAN/`), addition of `Global Irradiance` and `THI_adj`. Will be merged with GIGACOW-data.
+- **Description**: Preprocessed MESAN data (from `/RawMESAN/`), addition of `Global Irradiance` and `THI_adj`, fetched from [STRÅNG](https://www.smhi.se/forskning/forskningsenheter/meteorologi/strang-en-modell-for-solstralning-1.329). Will be merged with GIGACOW-data.
 - **File(s)**:
   - `processed_data_XXXX.csv`: Data in csv format.
     - Has the following columns:
