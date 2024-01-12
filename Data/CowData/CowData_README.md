@@ -6,15 +6,23 @@ Welcome to the `CowData` folder! This directory contains the dairy cow datasets 
 
 ### 1. `/GIGACOW/`
 
-- **Description**: This dataset contains information about [describe the content of the first dataset].
+- **Description**: This dataset contains the filtered GIGACOW data.
 - **File(s)**:
-  - `first_dataset.csv`: Main data file.
+  - `Cow_filtered.csv`: Individual cow information.
+  - `DiagnosisTreatment_csv.csv`: Diagnosis occasions of individual cows. Filtered between specified dates.
+  - `Lactation_filtered.csv`: Not used. Filtered between specified dates.
+  - `MilkYield_filtered.csv`: Every milking occasion for each indivdual cow. Filtered between specified dates.
+  - `Robot_filtered.csv`: Similar to above, but with more columns. Filtered between specified dates.
 
 
 ### 2. `/RawGIGACOW/`
-- **Description**: [Provide a brief description of the second dataset].
+- **Description**: This dataset contains the raw GIGACOW data.
 - **File(s)**:
-  - `second_dataset.csv`: Data in csv format.
+  - `Cow_filtered.csv`: Individual cow information.
+  - `DiagnosisTreatment_csv.csv`: Diagnosis occasions of individual cows.
+  - `Lactation_filtered.csv`: Not used.
+  - `MilkYield_filtered.csv`: Every milking occasion for each indivdual cow.
+  - `Robot_filtered.csv`: Similar to above, but with more columns. Not used.
 
 
 ## Notes

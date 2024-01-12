@@ -19,9 +19,8 @@ This project sutdies the relationship between weather conditions and dairy cow m
 
 ## Features
 
-- Data preprocessing of dairy and weather data
-- Employment of several statistical methods
-- ...
+- Data preprocessing of dairy and weather data.
+- Employment of several statistical methods.
 
 ## Repo structure
 ```
@@ -111,3 +110,13 @@ Some datasets are necessary and should be placed in the "Data" folder according 
 ### 2. Preproccess the data
 Run the two cells in `DataPreprocessing/DataPreprocessing.ipynb`
 ### 3. Run the models in `/Modeling/`
+
+## `/Modeling/` Content
+- `DataExploration.ipynb` - contains some initial exploration of the data, mainly focusing on the number of records for each farm.
+- `Bayesian.py` - contains scripts and functions used in `BayesianLinear.ipynb`
+- `BayesianLinear.ipynb` - fits a linear combinations of features to normalized daily total yield. For one cow, all cows on one farm and one model for one farm.
+- `BayesianGAM.ipynb` - fits a GAM model to either one farm or one cow.
+- `BoxPlots.ipynb` - shows basic differences in temperature and yield for mainly summer 22 and summer 23.
+- `DIMReduction.ipynb` - short attempt at dimension reductions on the dataset.
+- `ShortBreedStudy.ipynb` - short attempt at visualising differnces between breeds in yield during `HW=1` and `HW=0`.
+- `RandomForest.ipynb` - Applies normalization to yield and then uses RandomForests to find patterns in the data.
