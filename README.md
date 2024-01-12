@@ -4,7 +4,7 @@
 
 ## Introduction
 
-This project sutdies the relationship between weather conditions and dairy cow milk production in Swedish farms. The motivation stems from the critical importance of understanding how varying temperatures, specifically heat, influence this aspect of agriculture. By combining data from weather and dairy sources, the study employs a diverse set of mathematical and machine learning techniques. These methods, ranging from normalization techniques to modeling and statistical frameworks, enables a exploration of the dynamics. This GitHub repository serves as a hub for the codebase, providing a foundation for future studies.
+This project studies the relationship between weather conditions and dairy cow milk production in Swedish farms. The motivation stems from the critical importance of understanding how varying temperatures, specifically heat, influence this aspect of agriculture. By combining data from weather and dairy sources, the study employs a diverse set of mathematical and machine learning techniques. These methods, ranging from normalization techniques to modeling and statistical frameworks, enables a exploration of the dynamics. This GitHub repository serves as a hub for the codebase, providing a foundation for future studies.
 
 ## Contributors
 ### Authors
