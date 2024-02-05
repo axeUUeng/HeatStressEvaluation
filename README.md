@@ -94,12 +94,12 @@ Follow one of the installation guides for conda
 
 Python version used by the authors is `3.10.13`.
 
-Then to get the proper enviroment:
+Then to get the proper environment:
 ```bash
 # Conda env installation command
-conda create --name your_enviroment_name --file requirements.txt
+conda create --name your_environment_name --file requirements.txt
 ```
-If the creation of the enviroment doesn't work for some reason, the most important libraries are:
+If the creation of the environment doesn't work for some reason, the most important libraries are:
 - `Numpy`
 - `requests`
 - `scikit-learn`

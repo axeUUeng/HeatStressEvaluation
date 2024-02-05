@@ -228,8 +228,8 @@ class MilkDataProcessor:
             df = pd.merge(df, tf, on = "Tid")
             
             #THI calculation
-            df["THI_adj"] = 4.51 + (0.8 * df["Temperatur"]) + (df["Relativ fuktighet"] * (df["Temperatur"] - 14.4)) + 46.4 - 1.992 * df["Vindhastighet"] + 0.0068 * df["Global irradiance"]
-            
+            df["THI_adj"] = 4.51 + (0.8 * df["Temperatur"]) + (df["Relativ fuktighet"]/100 * (df["Temperatur"] - 14.4)) + 46.4 - 1.992 * df["Vindhastighet"] + 0.0068 * df["Global irradiance"]
+            df['Relativ fuktighet'] = df['Relativ fuktighet']/100
 
             #Writing the hourly data
             output_file_path = os.path.join(self.MESAN_directory, f"processed_data_{name}.csv")
